@@ -1,5 +1,7 @@
 # AI Control Plane
 
+[![verify](https://github.com/tommhci/ai-control-plane/actions/workflows/verify.yml/badge.svg)](https://github.com/tommhci/ai-control-plane/actions/workflows/verify.yml)
+
 Reusable AI collaboration infrastructure for product repositories.
 
 ## What This Is
