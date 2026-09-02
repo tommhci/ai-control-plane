@@ -10,12 +10,13 @@
 [CmdletBinding()]
 param(
     [switch]$Fix,
-    [switch]$Quiet
+    [switch]$Quiet,
+    [string]$ConfigPath
 )
 
 $ErrorActionPreference = "Stop"
 
-$mcpConfigPath = Join-Path $HOME ".gemini\config\mcp_config.json"
+$mcpConfigPath = if ($ConfigPath) { $ConfigPath } else { Join-Path $HOME ".gemini\config\mcp_config.json" }
 $extensionsDir = Join-Path $HOME ".antigravity-ide\extensions"
 
 $result = [ordered]@{
