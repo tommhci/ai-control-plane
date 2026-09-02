@@ -1,4 +1,4 @@
-# CANONICAL SOURCE — ai-control-plane/scripts/boundary-lint.ps1
+﻿# CANONICAL SOURCE — ai-control-plane/scripts/boundary-lint.ps1
 #
 # Global-canon boundary check (G/L separation — see AGENTS.md "Layering").
 # Binary verdict: exit 0 = PASS, exit 1 = FAIL. Designed for CI (verify

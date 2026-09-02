@@ -1,4 +1,4 @@
-# check-env-health.ps1 — session-open environment gate (L3: environment layer)
+﻿# check-env-health.ps1 — session-open environment gate (L3: environment layer)
 # Born from the 2026-09-02 incident: a live process reverted .git/refs and loose
 # objects in a dev directory sitting under the user profile. Git-layer governance
 # cannot defend against OS/process-level interference — so verify the environment

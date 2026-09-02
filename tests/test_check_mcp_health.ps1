@@ -1,4 +1,4 @@
-# CANONICAL SOURCE — ai-control-plane/tests/test_check_mcp_health.ps1
+﻿# CANONICAL SOURCE — ai-control-plane/tests/test_check_mcp_health.ps1
 #
 # Unit test for scripts/check-mcp-health.ps1
 

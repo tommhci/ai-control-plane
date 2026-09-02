@@ -1,4 +1,4 @@
-# CANONICAL SOURCE — ai-control-plane/scripts/check-mcp-health.ps1
+﻿# CANONICAL SOURCE — ai-control-plane/scripts/check-mcp-health.ps1
 #
 # Diagnostic and auto-repair utility for Antigravity MCP server configurations.
 # Checks:

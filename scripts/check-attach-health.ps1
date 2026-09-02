@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$ClientRoot = ".",
   [string]$ControlPlaneRepo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 )
