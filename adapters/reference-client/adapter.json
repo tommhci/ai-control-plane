@@ -1,0 +1,80 @@
+{
+  "adapterId": "reference-client",
+  "displayName": "Reference Client Application",
+  "controlPlaneRepo": "FILL_IN: absolute path to your ai-control-plane checkout",
+  "clientAdapterDir": ".control-plane",
+  "canonicalSources": [
+    "README.md",
+    "NODE_QUEUE.md",
+    "AGENTS.md",
+    "governance/README.md",
+    "governance/agent-constitution.md",
+    "HANDOVER.md"
+  ],
+  "queueFile": "NODE_QUEUE.md",
+  "handoverFile": "HANDOVER.md",
+  "proposalFile": "NODE_PROPOSALS.md",
+  "governanceRoot": "governance",
+  "ownershipFile": ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+  "sessionLog": ".agents/session_log.jsonl",
+  "effectivenessLog": ".agents/effectiveness_log.jsonl",
+  "protectedPathsFile": ".control-plane/protected-paths.json",
+  "verificationFile": ".control-plane/verification.json",
+  "requiredClientFiles": [
+    ".control-plane/adapter.json",
+    ".control-plane/protected-paths.json",
+    ".control-plane/verification.json",
+    ".control-plane/install-local-hooks.ps1",
+    ".control-plane/sync-shared-skills.ps1",
+    ".control-plane/smoke-test.ps1",
+    ".control-plane/resolve-control-plane.ps1",
+    ".control-plane/hooks/check-ownership.ps1",
+    ".control-plane/hooks/check-write-target.ps1",
+    ".control-plane/hooks/capture-session-state.ps1"
+  ],
+  "sharedSkills": [
+    "challenge-review",
+    "evidence-check",
+    "handoff",
+    "node-intake",
+    "plan-freeze",
+    "publish-safe",
+    "session-close",
+    "skill-review",
+    "verify-task"
+  ],
+  "localOnlySkills": [
+    "capture-idea",
+    "doc-sync"
+  ],
+  "sharedSkillCandidates": [
+    "collab-system-redteam",
+    "infrastructure-audit",
+    "learn-system",
+    "strategic-alignment"
+  ],
+  "skillBoundary": {
+    "localOnly": {
+      "capture-idea": "Human-owned INBOX capture for this repo; not a generic control-plane operation.",
+      "doc-sync": "Client layered-doc status reader; overlaps node-intake and is intentionally repo-specific."
+    },
+    "adapterAwareCandidate": {
+      "collab-system-redteam": "Useful across projects, but requires adapter-defined attack scenarios and read-only phase gates.",
+      "infrastructure-audit": "Useful across projects, but requires adapter-defined control roles, source files, and evidence expectations.",
+      "learn-system": "Broadly reusable learning loop, but references project-specific repo learning patterns today."
+    },
+    "rejectExtractionForNow": {
+      "strategic-alignment": "Depends on Client product vision, NODE_QUEUE, D7/D9 history, and sprint cadence; keep local until a generic strategy-audit interface exists."
+    }
+  },
+  "additionalPermissions": [
+    "Bash(npm run *)",
+    "Bash(npm test *)"
+  ],
+  "hookTemplates": {
+    "preToolUseMatcher": "Write|Edit",
+    "ownershipCommand": "powershell -NonInteractive -File .control-plane/hooks/check-ownership.ps1 -CheckOnly",
+    "writeGuardCommand": "powershell -NonInteractive -File .control-plane/hooks/check-write-target.ps1 -ProtectedPathsFile .control-plane/protected-paths.json",
+    "postCommitCaptureScript": ".control-plane/hooks/capture-session-state.ps1"
+  }
+}

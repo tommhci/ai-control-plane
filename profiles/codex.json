@@ -1,0 +1,29 @@
+{
+    "hook_support":  false,
+    "required_files":  [
+                           ".control-plane/adapter.json",
+                           ".control-plane/protected-paths.json",
+                           ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+                           ".agents/session_log.jsonl"
+                       ],
+    "permission_model":  "unknown — not yet validated",
+    "supported_status":  "experimental",
+    "settings_path":  ".codex/config.json",
+    "health_checks":  [
+                          "scripts/check-attach-health.ps1 — adapter + ownership checks only",
+                          "Hook integration: NOT VERIFIED"
+                      ],
+    "profile_id":  "codex",
+    "known_limitations":  [
+                              "Hook support unconfirmed — Codex CLI hook API not yet characterized",
+                              "settings_path and permission model not validated in real session",
+                              "Do not mark as verified until a full attach+session test is run"
+                          ],
+    "install_steps":  [
+                          "Copy templates/project-adapter/ into client .control-plane/",
+                          "Run installers/install-profile.ps1 -ClientRoot \u003cclient\u003e -Profile codex",
+                          "Manually configure .codex/config.json — schema TBD",
+                          "Run scripts/check-attach-health.ps1 -ClientRoot \u003cclient\u003e"
+                      ],
+    "harness":  "OpenAI Codex CLI"
+}

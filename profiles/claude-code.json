@@ -1,0 +1,31 @@
+{
+    "hook_support":  true,
+    "required_files":  [
+                           ".control-plane/adapter.json",
+                           ".control-plane/protected-paths.json",
+                           ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+                           ".agents/session_log.jsonl",
+                           ".claude/settings.local.json"
+                       ],
+    "permission_model":  "ask-mode with explicit allow/deny lists in settings.local.json",
+    "supported_status":  "verified",
+    "settings_path":  ".claude/settings.local.json",
+    "health_checks":  [
+                          "scripts/check-attach-health.ps1 — 17 checks, expect all PASS",
+                          "security/scan_client_security.ps1 — expect PASS or known .env finding only"
+                      ],
+    "profile_id":  "claude-code",
+    "known_limitations":  [
+                              "Permission grants require manual review per Claude Code release",
+                              "No MCP server surface scan in current security scanner",
+                              "Hook outputs truncated above ~10KB — use -OutputJson for large scan results"
+                          ],
+    "install_steps":  [
+                          "Copy templates/project-adapter/ into client .control-plane/",
+                          "Run installers/install-local-hooks.ps1 -ClientRoot \u003cclient\u003e",
+                          "Run installers/install-profile.ps1 -ClientRoot \u003cclient\u003e -Profile claude-code",
+                          "Run scripts/check-attach-health.ps1 -ClientRoot \u003cclient\u003e",
+                          "Verify .claude/settings.local.json has allowedTools + deniedTools lists"
+                      ],
+    "harness":  "Claude Code (claude.ai/code)"
+}

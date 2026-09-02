@@ -1,0 +1,54 @@
+{
+  "profile": "generic-ask-mode-baseline",
+  "status": "installable",
+  "notes": [
+    "Minimal Claude Code ask-mode profile for control-plane clients.",
+    "Deny is reserved for destructive operations; ask covers network, agent dispatch, settings, skills, MCP config, and protected-path-adjacent edits."
+  ],
+  "permissions": {
+    "deny": [
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "Bash(git push --force*)",
+      "Bash(rm -rf *)",
+      "Bash(Remove-Item * -Recurse*)",
+      "Bash(del /s *)"
+    ],
+    "ask": [
+      "WebFetch",
+      "WebSearch",
+      "Agent(*)",
+      "Write(.claude/**)",
+      "Edit(.claude/**)",
+      "Write(.agents/skills/**)",
+      "Edit(.agents/skills/**)",
+      "Write(.mcp.json)",
+      "Edit(.mcp.json)",
+      "Write(mcp.json)",
+      "Edit(mcp.json)",
+      "Write(governance/**)",
+      "Edit(governance/**)",
+      "Write(AGENTS.md)",
+      "Edit(AGENTS.md)",
+      "Write(AI_BOOTSTRAP.md)",
+      "Edit(AI_BOOTSTRAP.md)",
+      "Bash(git push *)",
+      "Bash(git worktree remove *)",
+      "Bash(git branch -D *)",
+      "Bash(npm install *)",
+      "Bash(pnpm install *)",
+      "Bash(yarn add *)",
+      "Bash(gh repo *)",
+      "Bash(gh pr merge *)"
+    ],
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(rg *)",
+      "Bash(npm test*)",
+      "Bash(npm run build*)"
+    ]
+  }
+}

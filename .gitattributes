@@ -1,0 +1,4 @@
+# Normalize line endings: store LF in git, checkout LF on every platform (incl. Windows).
+# Mixed-EOL files (CRLF + LF in one file) are NOT normalized by git 2.53
+# (treated as binary) - keep files uniform and renormalize after edits.
+* text=auto eol=lf

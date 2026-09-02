@@ -1,0 +1,4 @@
+{
+  "protectedPaths": ["{{YOUR_PROTECTED_PATHS_HERE}}"],
+  "notes": ["{{PROJECT_NAME}} protected paths - add your project-specific paths"]
+}

@@ -1,0 +1,15 @@
+{
+  "protectedPaths": [
+    "hooks/",
+    "security/",
+    "protocols/",
+    "skills/",
+    "templates/",
+    "AGENTS.md",
+    ".control-plane/protected-paths.json"
+  ],
+  "notes": [
+    "ai-control-plane platform self-governance. Mirrors the AGENTS.md 'Change Flow' governed list. Resolved first by approve_governance_commit.ps1 and pre_commit_protected_paths.ps1; the client-side fallback (governance/, AGENTS.md, AI_BOOTSTRAP.md) applies only when this file is absent.",
+    "Tracked (unlike client-side copies): the platform's mechanical protection surface must survive a fresh clone. Added 2026-08-29 with the G/R/L layering work."
+  ]
+}

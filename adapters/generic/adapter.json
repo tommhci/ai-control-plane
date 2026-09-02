@@ -1,0 +1,46 @@
+{
+  "adapterId": "generic",
+  "displayName": "Generic AI Control Plane Client",
+  "controlPlaneRepo": "FILL_IN: absolute path to your ai-control-plane checkout",
+  "sharedAdapterPath": "adapters/generic/adapter.json",
+  "clientAdapterDir": ".control-plane",
+  "canonicalSources": [
+    "README.md",
+    "AGENTS.md",
+    "HANDOVER.md"
+  ],
+  "ownershipFile": ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+  "sessionLog": ".agents/session_log.jsonl",
+  "effectivenessLog": ".agents/effectiveness_log.jsonl",
+  "protectedPathsFile": ".control-plane/protected-paths.json",
+  "verificationFile": ".control-plane/verification.json",
+  "requiredClientFiles": [
+    ".control-plane/adapter.json",
+    ".control-plane/protected-paths.json",
+    ".control-plane/verification.json",
+    ".control-plane/resolve-control-plane.ps1",
+    ".control-plane/hooks/check-ownership.ps1",
+    ".control-plane/hooks/check-write-target.ps1",
+    ".control-plane/hooks/capture-session-state.ps1"
+  ],
+  "sharedSkills": [
+    "challenge-review",
+    "evidence-check",
+    "handoff",
+    "node-intake",
+    "plan-freeze",
+    "publish-safe",
+    "session-close",
+    "skill-review",
+    "verify-task"
+  ],
+  "localOnlySkills": [],
+  "sharedSkillCandidates": [],
+  "additionalPermissions": [],
+  "hookTemplates": {
+    "preToolUseMatcher": "Write|Edit",
+    "ownershipCommand": "powershell -NonInteractive -File .control-plane/hooks/check-ownership.ps1 -CheckOnly",
+    "writeGuardCommand": "powershell -NonInteractive -File .control-plane/hooks/check-write-target.ps1 -ProtectedPathsFile .control-plane/protected-paths.json",
+    "postCommitCaptureScript": ".control-plane/hooks/capture-session-state.ps1"
+  }
+}

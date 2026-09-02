@@ -1,0 +1,27 @@
+{
+    "hook_support":  false,
+    "required_files":  [
+                           ".control-plane/adapter.json",
+                           ".control-plane/protected-paths.json",
+                           ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+                           ".agents/session_log.jsonl"
+                       ],
+    "permission_model":  "unknown",
+    "supported_status":  "stub",
+    "settings_path":  "",
+    "health_checks":  [
+                          "scripts/check-attach-health.ps1 — adapter + ownership checks only"
+                      ],
+    "profile_id":  "generic",
+    "known_limitations":  [
+                              "No harness-specific configuration known",
+                              "Hook support: unknown",
+                              "Do not claim verified support — this profile is a bootstrap template only"
+                          ],
+    "install_steps":  [
+                          "Copy templates/project-adapter/ into client .control-plane/",
+                          "Manually adapt install steps to your harness",
+                          "Run scripts/check-attach-health.ps1 -ClientRoot \u003cclient\u003e"
+                      ],
+    "harness":  "Generic / Unknown AI harness"
+}

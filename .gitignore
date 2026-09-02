@@ -1,0 +1,26 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local scratch / logs
+*.log
+*.tmp
+scratch/
+
+# Agent runtime sessions & private logs
+.agents/
+
+# Local control plane state & runtime logs
+.control-plane/*.jsonl
+.control-plane/.*.jsonl
+.control-plane/*.token
+.control-plane/adapter.json

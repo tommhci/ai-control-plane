@@ -1,0 +1,6 @@
+# One path pattern per line.
+# Client repos should replace or extend this file with their own protected paths.
+
+governance/
+AGENTS.md
+AI_BOOTSTRAP.md

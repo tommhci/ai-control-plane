@@ -1,0 +1,30 @@
+{
+    "hook_support":  false,
+    "required_files":  [
+                           ".control-plane/adapter.json",
+                           ".control-plane/protected-paths.json",
+                           ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+                           ".agents/session_log.jsonl",
+                           ".cursor/rules/project.mdc"
+                       ],
+    "permission_model":  "rules-file based — .cursor/rules/*.mdc; no formal allow/deny list",
+    "supported_status":  "experimental",
+    "settings_path":  ".cursor/rules/",
+    "health_checks":  [
+                          "scripts/check-attach-health.ps1 — adapter + ownership checks",
+                          "Drift scanner: scripts/scan_control_plane_drift.ps1 for coupling check"
+                      ],
+    "profile_id":  "cursor",
+    "known_limitations":  [
+                              "No hook API — session_log writes must be triggered manually or via git hooks",
+                              ".cursor/rules/ is not standardized across Cursor versions",
+                              "Do not mark as verified until a full attach+session test is run"
+                          ],
+    "install_steps":  [
+                          "Copy templates/project-adapter/ into client .control-plane/",
+                          "Run installers/install-profile.ps1 -ClientRoot \u003cclient\u003e -Profile cursor",
+                          "Manually create .cursor/rules/project.mdc with project governance references",
+                          "Run scripts/check-attach-health.ps1 -ClientRoot \u003cclient\u003e"
+                      ],
+    "harness":  "Cursor IDE (cursor.sh)"
+}

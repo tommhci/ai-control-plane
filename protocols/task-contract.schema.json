@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ai-control-plane:task-contract:v1",
+  "title": "AI Control Plane Task Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "contract_version",
+    "raw_user_intent",
+    "goal",
+    "observed_facts",
+    "unknowns",
+    "hypotheses",
+    "invariants",
+    "scope",
+    "non_scope",
+    "risk",
+    "adapter",
+    "permissions_required",
+    "acceptance_evidence",
+    "verification_method",
+    "stop_conditions"
+  ],
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "raw_user_intent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_facts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observedFact"
+      }
+    },
+    "unknowns": {
+      "$ref": "#/$defs/stringList"
+    },
+    "hypotheses": {
+      "$ref": "#/$defs/stringList"
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/invariant"
+      }
+    },
+    "scope": {
+      "$ref": "#/$defs/stringList"
+    },
+    "non_scope": {
+      "$ref": "#/$defs/stringList"
+    },
+    "risk": {
+      "$ref": "#/$defs/risk"
+    },
+    "adapter": {
+      "type": "string",
+      "enum": [
+        "generic-repo-change",
+        "ui-system",
+        "git-governance"
+      ]
+    },
+    "permissions_required": {
+      "$ref": "#/$defs/stringList"
+    },
+    "acceptance_evidence": {
+      "$ref": "#/$defs/stringList"
+    },
+    "verification_method": {
+      "$ref": "#/$defs/stringList"
+    },
+    "stop_conditions": {
+      "$ref": "#/$defs/stringList"
+    },
+    "supersedes_contract": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "observedFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "source"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "user",
+            "file",
+            "tool",
+            "project_protocol"
+          ]
+        },
+        "evidence_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "source"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "user",
+            "project_protocol",
+            "high_confidence_inference"
+          ]
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "forced_escalation_reasons",
+        "ambiguity",
+        "blast_radius",
+        "irreversibility",
+        "domain_uncertainty",
+        "verification_complexity",
+        "depth"
+      ],
+      "properties": {
+        "forced_escalation_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ambiguity": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "blast_radius": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "irreversibility": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "domain_uncertainty": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "verification_complexity": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "depth": {
+          "type": "string",
+          "enum": [
+            "pass-through",
+            "compact",
+            "gated"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "forced_escalation_reasons": {
+                "minItems": 1
+              }
+            },
+            "required": [
+              "forced_escalation_reasons"
+            ]
+          },
+          "then": {
+            "properties": {
+              "depth": {
+                "const": "gated"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2
+    }
+  }
+}

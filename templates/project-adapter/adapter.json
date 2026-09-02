@@ -1,0 +1,12 @@
+{
+  "adapterId": "{{PROJECT_ID}}",
+  "project": "{{PROJECT_NAME}}",
+  "displayName": "{{DISPLAY_NAME}}",
+  "mode": "client",
+  "controlPlaneRepo": "{{ABSOLUTE_PATH_TO_AI_CONTROL_PLANE}}",
+  "sharedAdapterPath": "adapters/generic/adapter.json",
+  "canonicalSources": ["README.md", "AGENTS.md"],
+  "ownershipFile": ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+  "sessionLog": ".agents/session_log.jsonl",
+  "effectivenessLog": ".agents/effectiveness_log.jsonl"
+}

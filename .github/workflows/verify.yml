@@ -1,0 +1,63 @@
+# CI verification gate (P0, 2026-08-28) — machine verdict replaces session-level
+# "AI said it verified" claims. Acceptance criterion for every push/PR is CI green.
+#
+# HONEST BOUNDARY: the runner is an en-US host. The zh-CN-specific PS 5.1 quirks
+# documented in findings register item 5 (BOM-less UTF-8 read as ANSI/GBK) may
+# NOT reproduce here. CI is a third host: its value is independence and
+# enforcement, not replacement for the local zh-CN environment.
+#
+# run-full-suite.ps1 already runs every test under BOTH pwsh7 and Windows
+# PowerShell 5.1 internally, so invoking it once under pwsh yields the full
+# dual-host matrix.
+
+name: verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Encoding check
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-encoding.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Boundary lint (G/L separation, server-side rerun)
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/boundary-lint.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Worktree/object-store integrity audit
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/worktree-audit.ps1 -RepoPath . -FailOnIntegrity
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Dual-host full suite (pwsh7 + PS5.1 matrix)
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/run-full-suite.ps1 2>&1 | Tee-Object -FilePath suite-log.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-logs-${{ github.run_id }}
+          path: |
+            suite-log.txt
+          if-no-files-found: ignore
+          retention-days: 14

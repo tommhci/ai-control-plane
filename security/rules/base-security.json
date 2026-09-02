@@ -1,0 +1,142 @@
+{
+  "rule_pack_id": "base-security",
+  "version": "1.0.0",
+  "description": "Core security checks applicable to any ai-control-plane client",
+  "rules": [
+    {
+      "rule_id": "SEC-001",
+      "name": "env_file_detection",
+      "category": "secrets",
+      "severity": "HIGH",
+      "description": "Detects .env files that may contain credentials",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".env", ".env.local", ".env.production", ".env.secret"],
+      "message": ".env file detected - may contain credentials. Contents NOT read.",
+      "remediation": "Add .env to .gitignore; move credentials to a secrets manager"
+    },
+    {
+      "rule_id": "SEC-002",
+      "name": "secret_pattern_scan",
+      "category": "secrets",
+      "severity": "HIGH",
+      "description": "Scans config/agent files for secret-like patterns without reading values",
+      "enabled": true,
+      "match_type": "content_pattern",
+      "targets": [".control-plane", ".agents"],
+      "patterns": ["API_KEY\\s*=", "SECRET\\s*=", "TOKEN\\s*=", "PRIVATE_KEY", "sk-[A-Za-z0-9]{20,}", "ghp_[A-Za-z0-9]{36}", "password\\s*=\\s*\\S+"],
+      "extensions": [".json", ".yaml", ".yml", ".md", ".ps1", ".sh"],
+      "message": "Secret-like pattern found (key name only - value not shown)",
+      "remediation": "Remove secret from file; use environment variables or secrets manager"
+    },
+    {
+      "rule_id": "SEC-003",
+      "name": "missing_adapter",
+      "category": "adapter",
+      "severity": "HIGH",
+      "description": "Checks that adapter.json exists and is valid JSON",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".control-plane/adapter.json"],
+      "message": "adapter.json missing",
+      "remediation": "Run ai-control-plane installer"
+    },
+    {
+      "rule_id": "SEC-004",
+      "name": "missing_protected_paths",
+      "category": "protected-paths",
+      "severity": "HIGH",
+      "description": "Checks that protected-paths.json exists and is non-empty",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".control-plane/protected-paths.json"],
+      "message": "protected-paths.json missing",
+      "remediation": "Run ai-control-plane installer"
+    },
+    {
+      "rule_id": "SEC-005",
+      "name": "agents_md_protected",
+      "category": "protected-paths",
+      "severity": "HIGH",
+      "description": "Checks that AGENTS.md is in the protectedPaths list",
+      "enabled": true,
+      "match_type": "json_field_contains",
+      "target_file": ".control-plane/protected-paths.json",
+      "field_path": "protectedPaths",
+      "expected": "AGENTS.md",
+      "message": "AGENTS.md is not in protectedPaths",
+      "remediation": "Add AGENTS.md to protectedPaths in protected-paths.json"
+    },
+    {
+      "rule_id": "SEC-006",
+      "name": "missing_precommit_hook",
+      "category": "hooks",
+      "severity": "HIGH",
+      "description": "Checks that the git pre-commit hook is installed",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".git/hooks/pre-commit"],
+      "message": "pre-commit hook missing - protected-path enforcement inactive",
+      "remediation": "Run ai-control-plane installer"
+    },
+    {
+      "rule_id": "SEC-007",
+      "name": "prompt_injection_scan",
+      "category": "prompt-injection",
+      "severity": "MEDIUM",
+      "description": "Scans markdown files for known prompt-injection phrases",
+      "enabled": true,
+      "match_type": "content_pattern",
+      "targets": [".", "audits", "inventory", "docs", ".agents"],
+      "patterns": [
+        "ignore previous instructions",
+        "disregard system instructions",
+        "reveal hidden prompt",
+        "bypass hooks",
+        "disable safety",
+        "ignore all previous",
+        "pretend you have no restrictions"
+      ],
+      "extensions": [".md"],
+      "message": "Possible prompt-injection phrase detected",
+      "remediation": "Review file; ensure phrase is quoted/escaped if intentional reference"
+    },
+    {
+      "rule_id": "SEC-008",
+      "name": "missing_session_log",
+      "category": "data",
+      "severity": "MEDIUM",
+      "description": "Checks that session_log.jsonl exists",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".agents/session_log.jsonl"],
+      "message": "session_log.jsonl missing - no session history",
+      "remediation": "Ensure .agents/ directory exists and write_session_event.ps1 is used"
+    },
+    {
+      "rule_id": "SEC-009",
+      "name": "precommit_no_cp_reference",
+      "category": "hooks",
+      "severity": "MEDIUM",
+      "description": "Checks that the pre-commit hook references control-plane scripts",
+      "enabled": true,
+      "match_type": "content_pattern_file",
+      "targets": [".git/hooks/pre-commit"],
+      "patterns": ["control-plane|protected.path"],
+      "message": "pre-commit hook does not reference control-plane or protected-path scripts",
+      "remediation": "Verify hook was installed by ai-control-plane"
+    },
+    {
+      "rule_id": "SEC-010",
+      "name": "no_sqlite_mirror",
+      "category": "data",
+      "severity": "LOW",
+      "description": "Checks for presence of a SQLite mirror DB",
+      "enabled": true,
+      "match_type": "glob_exists",
+      "targets": [".agents/*.db"],
+      "message": "No SQLite mirror DB found (.agents/*.db)",
+      "remediation": "Run state/sqlite/import_jsonl_to_sqlite.ps1 to create mirror"
+    }
+  ]
+}

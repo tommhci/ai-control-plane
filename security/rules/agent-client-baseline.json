@@ -1,0 +1,84 @@
+{
+  "rule_pack_id": "agent-client-baseline",
+  "version": "1.0.0",
+  "description": "Additional checks for clients with active AI agent sessions. Extends base-security.",
+  "extends": "base-security",
+  "rules": [
+    {
+      "rule_id": "ACB-001",
+      "name": "missing_settings_json",
+      "category": "settings",
+      "severity": "HIGH",
+      "description": "Checks that .claude/settings.local.json exists (Claude Code clients)",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".claude/settings.local.json"],
+      "message": ".claude/settings.local.json missing - AI permissions not declared",
+      "remediation": "Run install-claude-client.ps1 or install-profile.ps1 -Profile claude-code"
+    },
+    {
+      "rule_id": "ACB-002",
+      "name": "missing_pretooluse_hooks",
+      "category": "settings",
+      "severity": "MEDIUM",
+      "description": "Checks that PreToolUse hooks are declared in Claude settings",
+      "enabled": true,
+      "match_type": "json_field_nonempty",
+      "target_file": ".claude/settings.local.json",
+      "field_path": "hooks.PreToolUse",
+      "message": "PreToolUse hooks not declared - write-guard may be inactive",
+      "remediation": "Run install-claude-client.ps1 to wire hooks"
+    },
+    {
+      "rule_id": "ACB-003",
+      "name": "broad_allow_pattern",
+      "category": "settings",
+      "severity": "HIGH",
+      "description": "Detects dangerously broad allow patterns in Claude settings",
+      "enabled": true,
+      "match_type": "json_field_contains_any",
+      "target_file": ".claude/settings.local.json",
+      "field_path": "permissions.allow",
+      "dangerous": ["Bash(*)", "Write(*)", "Edit(*)"],
+      "message": "Dangerously broad allow pattern detected",
+      "remediation": "Scope allow patterns to specific commands"
+    },
+    {
+      "rule_id": "ACB-004",
+      "name": "ownership_lock_present",
+      "category": "governance",
+      "severity": "MEDIUM",
+      "description": "Checks that ACTIVE_EDIT_OWNERSHIP.md exists to prevent concurrent writes",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".agents/ACTIVE_EDIT_OWNERSHIP.md"],
+      "message": "ACTIVE_EDIT_OWNERSHIP.md missing - no concurrent-write guard",
+      "remediation": "Create .agents/ACTIVE_EDIT_OWNERSHIP.md from template"
+    },
+    {
+      "rule_id": "ACB-005",
+      "name": "postcommit_hook_present",
+      "category": "hooks",
+      "severity": "MEDIUM",
+      "description": "Checks that the git post-commit hook is installed for session state capture",
+      "enabled": true,
+      "match_type": "file_exists",
+      "targets": [".git/hooks/post-commit"],
+      "message": "post-commit hook missing - session state capture inactive",
+      "remediation": "Run ai-control-plane installer"
+    },
+    {
+      "rule_id": "ACB-006",
+      "name": "unresolved_hook_placeholder",
+      "category": "hooks",
+      "severity": "HIGH",
+      "description": "Detects unresolved template placeholder in post-commit hook",
+      "enabled": true,
+      "match_type": "content_pattern_file",
+      "targets": [".git/hooks/post-commit"],
+      "patterns": ["\\{\\{CAPTURE_SESSION_STATE\\}\\}"],
+      "message": "post-commit hook has unresolved {{CAPTURE_SESSION_STATE}} placeholder",
+      "remediation": "Re-run install-claude-client.ps1 to substitute placeholder"
+    }
+  ]
+}

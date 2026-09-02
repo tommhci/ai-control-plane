@@ -1,0 +1,30 @@
+{
+    "hook_support": false,
+    "required_files": [
+        ".control-plane/adapter.json",
+        ".control-plane/protected-paths.json",
+        ".agents/ACTIVE_EDIT_OWNERSHIP.md",
+        ".agents/session_log.jsonl",
+        "AGENTS.md"
+    ],
+    "permission_model": "governance via AGENTS.md + shared skills; native OpenCode permission system (allow/ask/deny, per-agent, bash command-level globs) available but not yet configured",
+    "supported_status": "experimental",
+    "settings_path": "opencode.json",
+    "health_checks": [
+        "scripts/check-attach-health.ps1 — adapter + ownership checks only"
+    ],
+    "profile_id": "opencode",
+    "known_limitations": [
+        "Hook enforcement not yet deployed — OpenCode has no PreToolUse equivalent; hooks exist only via the plugin API (tool.execute.before/after in .opencode/plugins/), which the control plane has not wired",
+        "Session logging is manual — no automated trigger forces writes to .agents/session_log.jsonl; OpenCode session events (created/idle/updated/deleted) have no session.closed/ended, and session.idle semantics are not verified as equivalent to user ending the session",
+        "Governance is self-honored via AGENTS.md/skills, not enforced at the harness boundary",
+        "No real OpenCode session validation has been performed yet — Do not report as verified until a full attach+session test is run"
+    ],
+    "install_steps": [
+        "Copy templates/project-adapter/ into client .control-plane/",
+        "Run installers/install-profile.ps1 -ClientRoot <client> -Profile opencode",
+        "Optionally create project opencode.json (official schema: https://opencode.ai/config.json) with permission defaults (edit/bash/external_directory ask-mode); do not duplicate protected-paths.json rules",
+        "Run scripts/check-attach-health.ps1 -ClientRoot <client>"
+    ],
+    "harness": "OpenCode (opencode.ai)"
+}
