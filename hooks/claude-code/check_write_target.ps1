@@ -18,22 +18,37 @@ if ([string]::IsNullOrWhiteSpace($ToolInputJson)) {
   try {
     $ToolInputJson = [Console]::In.ReadToEnd()
   } catch {
-    exit 0
+    [Console]::Error.WriteLine("[SECURITY BLOCKED] Failed to read stdin in check_write_target: $_")
+    exit 2
   }
 }
+
+if ([string]::IsNullOrWhiteSpace($ToolInputJson)) {
+  [Console]::Error.WriteLine("[SECURITY BLOCKED] Empty payload received in check_write_target (Fail-Closed)")
+  exit 2
+}
+
+$ToolInputJson = $ToolInputJson.TrimStart([char]0xFEFF)
 
 $filePath = ""
 try {
   $parsed = $ToolInputJson | ConvertFrom-Json
-  $filePath = $parsed.file_path
-  if ([string]::IsNullOrWhiteSpace($filePath)) {
+  if ($null -ne $parsed.tool_input -and -not [string]::IsNullOrWhiteSpace($parsed.tool_input.file_path)) {
+    $filePath = $parsed.tool_input.file_path
+  } elseif (-not [string]::IsNullOrWhiteSpace($parsed.file_path)) {
+    $filePath = $parsed.file_path
+  } elseif (-not [string]::IsNullOrWhiteSpace($parsed.path)) {
     $filePath = $parsed.path
   }
 } catch {
-  exit 0
+  [Console]::Error.WriteLine("[SECURITY BLOCKED] JSON payload parse failure in check_write_target: $_ (Fail-Closed)")
+  exit 2
 }
 
-if ([string]::IsNullOrWhiteSpace($filePath)) { exit 0 }
+if ([string]::IsNullOrWhiteSpace($filePath)) {
+  [Console]::Error.WriteLine("[SECURITY BLOCKED] Missing file_path in tool input (Fail-Closed)")
+  exit 2
+}
 
 $filePath = $filePath -replace '\\', '/'
 

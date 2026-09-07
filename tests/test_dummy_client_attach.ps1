@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$ControlPlaneRepo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path,
   [string]$ClientRoot = (Join-Path $env:TEMP ("ai-control-plane-dummy-client-" + [guid]::NewGuid().ToString("N"))),
   [switch]$KeepClient  # set by callers that need to reuse the client dir after this test completes
@@ -194,14 +194,34 @@ try {
     throw "Ownership hook failed with exit $($ownership.ExitCode)"
   }
 
-  $blocked = Invoke-HookCommand -Command $commands[1] -InputJson '{"file_path":"governance/policy.md"}' -ControlPlaneRepo $ControlPlaneRepo
-  if ($blocked.ExitCode -eq 0) {
-    throw "Expected dummy protected path to be blocked (got exit $($blocked.ExitCode); output: $($blocked.Output -join ' | '))"
+  # Test 1: Official nested Claude Code payload for protected path (Write/Edit)
+  $blocked = Invoke-HookCommand -Command $commands[1] -InputJson '{"tool_name":"Write","tool_input":{"file_path":"governance/policy.md"}}' -ControlPlaneRepo $ControlPlaneRepo
+  if ($blocked.ExitCode -ne 2) {
+    throw "Expected nested protected path to be blocked with exit 2 (got exit $($blocked.ExitCode); output: $($blocked.Output -join ' | '))"
   }
 
-  $allowed = Invoke-HookCommand -Command $commands[1] -InputJson '{"file_path":"src/example.txt"}' -ControlPlaneRepo $ControlPlaneRepo
+  # Test 2: Official nested Claude Code payload for ordinary allowed path
+  $allowed = Invoke-HookCommand -Command $commands[1] -InputJson '{"tool_name":"Write","tool_input":{"file_path":"src/example.txt"}}' -ControlPlaneRepo $ControlPlaneRepo
   if ($allowed.ExitCode -ne 0) {
-    throw "Expected ordinary dummy path to be allowed"
+    throw "Expected ordinary dummy path to be allowed (got exit $($allowed.ExitCode); output: $($allowed.Output -join ' | '))"
+  }
+
+  # Test 3: Backward-compatibility for legacy flat payload
+  $legacyBlocked = Invoke-HookCommand -Command $commands[1] -InputJson '{"file_path":"governance/policy.md"}' -ControlPlaneRepo $ControlPlaneRepo
+  if ($legacyBlocked.ExitCode -ne 2) {
+    throw "Expected legacy flat protected path to be blocked with exit 2 (got exit $($legacyBlocked.ExitCode); output: $($legacyBlocked.Output -join ' | '))"
+  }
+
+  # Test 4: Corrupted JSON must fail-closed (exit 2)
+  $corrupted = Invoke-HookCommand -Command $commands[1] -InputJson '{invalid json' -ControlPlaneRepo $ControlPlaneRepo
+  if ($corrupted.ExitCode -ne 2) {
+    throw "Expected corrupted payload to fail-closed with exit 2 (got exit $($corrupted.ExitCode); output: $($corrupted.Output -join ' | '))"
+  }
+
+  # Test 5: Missing file_path must fail-closed (exit 2)
+  $missingPath = Invoke-HookCommand -Command $commands[1] -InputJson '{"tool_name":"Write","tool_input":{}}' -ControlPlaneRepo $ControlPlaneRepo
+  if ($missingPath.ExitCode -ne 2) {
+    throw "Expected missing file_path payload to fail-closed with exit 2 (got exit $($missingPath.ExitCode); output: $($missingPath.Output -join ' | '))"
   }
 
   & powershell -NoProfile -ExecutionPolicy Bypass -File ".control-plane/hooks/capture-session-state.ps1" `
