@@ -110,7 +110,7 @@ function Invoke-GuardedGh {
         return
     }
 
-    Write-Error "[CREDENTIAL GUARD] BLOCKED '$fullCmd' — plaintext token output forbidden. Use 'gh auth status' (no --show-token) to verify auth state."
+    Write-Error "[CREDENTIAL GUARD] BLOCKED: '$fullCmd' — plaintext token output forbidden. Use 'gh auth status' (no --show-token) to verify auth state."
     exit 1
 }
 
@@ -119,16 +119,32 @@ function Register-CredentialGuard {
     .SYNOPSIS
     Installs the credential stdout guard into the current PowerShell session.
     Call from $PROFILE after dot-sourcing this file.
+
+    NOTE: Uses 'function global:git' syntax (not Set-Alias) because PowerShell
+    resolves Function entries before Application entries (git.exe), but Alias
+    entries pointing to a function name fail when the function isn't in Global scope.
+    Verified empirically: Set-Alias approach silently falls through to git.exe.
     #>
     if ($env:CREDENTIAL_GUARD_DISABLE -eq '1') {
         Write-Warning "[CREDENTIAL GUARD] Skipping registration — CREDENTIAL_GUARD_DISABLE=1 is set."
         return
     }
 
-    Set-Alias -Name 'git' -Value 'Invoke-GuardedGit' -Scope Global -Force
-    Set-Alias -Name 'gh'  -Value 'Invoke-GuardedGh'  -Scope Global -Force
+    # Define global functions that shadow git.exe and gh.exe
+    # These take precedence over Application entries in PS command resolution.
+    $gitBlock = [scriptblock]::Create('Invoke-GuardedGit @args')
+    $ghBlock  = [scriptblock]::Create('Invoke-GuardedGh  @args')
 
-    Write-Host "[CREDENTIAL GUARD] Active — plaintext credential commands are intercepted." -ForegroundColor Cyan
+    New-Item -Path Function:Global:git -Value $gitBlock -Force | Out-Null
+    New-Item -Path Function:Global:gh  -Value $ghBlock  -Force | Out-Null
+
+    # Verify registration worked
+    $gitCmd = Get-Command git -CommandType Function -ErrorAction SilentlyContinue
+    if ($gitCmd) {
+        Write-Host "[CREDENTIAL GUARD] Active — plaintext credential commands are intercepted." -ForegroundColor Cyan
+    } else {
+        Write-Warning "[CREDENTIAL GUARD] WARNING: function registration failed. Guard is NOT active."
+    }
 }
 
 function Disable-CredentialGuard {
@@ -137,7 +153,7 @@ function Disable-CredentialGuard {
     Disables the guard for this session. Document reason in ADR-0005 §2.8 first.
     #>
     $env:CREDENTIAL_GUARD_DISABLE = '1'
-    Remove-Item -Path Alias:git -ErrorAction SilentlyContinue
-    Remove-Item -Path Alias:gh  -ErrorAction SilentlyContinue
-    Write-Warning "[CREDENTIAL GUARD] DISABLED. Document reason in ADR-0005 §2.8."
+    Remove-Item -Path Function:Global:git -ErrorAction SilentlyContinue
+    Remove-Item -Path Function:Global:gh  -ErrorAction SilentlyContinue
+    Write-Warning "[CREDENTIAL GUARD] DISABLED for this session. Document reason in ADR-0005 §2.8."
 }
