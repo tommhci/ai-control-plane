@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # ============================================================
 # block-credential-stdout.ps1
 # AI Control Plane — Credential Stdout Guard
@@ -8,9 +8,9 @@
 #   to stdout (where AI session context can capture them).
 #
 # INSTALL (once, into PowerShell profile):
-#   Add these two lines to C:\Users\1\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+#   Add these two lines to $PROFILE (run `$PROFILE` in pwsh to see the path):
 #
-#     . "C:\dev\ai-control-plane\security\block-credential-stdout.ps1"
+#     . "<path-to-ai-control-plane>\security\block-credential-stdout.ps1"
 #     Register-CredentialGuard
 #
 # WHAT IT BLOCKS (non-interactive / AI sessions — hard exit 1):
