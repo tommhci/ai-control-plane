@@ -168,11 +168,15 @@ Copyright 2026 tommhci and contributors.
 
 ## Current Status
 
-This repository is private-by-default. Do not treat historical public-boundary notes as current publication approval.
+Published deliberately as a portfolio and reference implementation (owner decision,
+2026-09-11). It is not a supported production release.
 
 - Initial extraction: complete
-- Public-boundary audit: historical only (2026-06-28); re-run before any visibility change
-- Release-readiness gate: historical only (2026-06-28); current release requires fresh security review
+- Public-boundary audit: last full audit 2026-06-28; an AI-assisted re-screen on
+  2026-09-11 found no credentials, no personal data, and no content from the private
+  working repositories, and flagged a small number of cosmetic disclosures (client
+  project names, one local dev path) for cleanup
+- Release-readiness: reference implementation only — no release artifact is published
 - Example adapter: `adapters/reference-client/` (worked example; contains no private data)
 
 ## Health Check (lightweight)
