@@ -2,6 +2,12 @@
 
 [![verify](https://github.com/tommhci/ai-control-plane/actions/workflows/verify.yml/badge.svg)](https://github.com/tommhci/ai-control-plane/actions/workflows/verify.yml)
 
+A **Windows / PowerShell reference implementation** for auditable AI-assisted software development. It includes project onboarding, Git hooks, protected-path checks, and repeatable verification.
+
+**Current support boundary:** The Claude Code profile is the principal verified integration on Windows PowerShell 5.1 / PowerShell 7. Codex, Cursor, and OpenCode profiles are experimental; the generic profile is a documentation stub. **This is not a supported production release.**
+
+**Start:** [Attach an existing project](#adopting-this-control-plane) in a disposable test repository, then run the installer health check. See [Security policy](SECURITY.md) and [Current status](#current-status).
+
 Reusable AI collaboration infrastructure for product repositories.
 
 ## What This Is
